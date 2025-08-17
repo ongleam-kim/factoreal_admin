@@ -1,55 +1,48 @@
-import { pgTable, uuid, varchar, text, boolean, timestamp, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, varchar, text, boolean, timestamp, pgEnum } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
-// Enums for type safety
-export const inquiryTypeEnum = pgEnum('inquiry_type', [
-  'technical',
-  'general',
-  'pricing',
-  'feature_request',
-  'bug_report'
+// Enums for type safety (기존 DB에 맞게 수정)
+export const userTypeEnum = pgEnum('UserType', ['GUEST', 'AUTHENTICATED']);
+
+export const inquiryTypeEnum = pgEnum('InquiryType', [
+  'URL_VERIFICATION',
+  'GENERAL_INQUIRY'
 ]);
 
-export const inquiryStatusEnum = pgEnum('inquiry_status', [
-  'pending',
-  'processing', 
-  'resolved',
-  'closed'
+export const inquiryStatusEnum = pgEnum('InquiryStatus', [
+  'PENDING',
+  'PROCESSING', 
+  'RESOLVED',
+  'CLOSED'
 ]);
 
-export const inquiryPriorityEnum = pgEnum('inquiry_priority', [
-  'low',
-  'medium',
-  'high',
-  'urgent'
-]);
-
-// Users table (기존 Supabase 구조 기반)
+// Users table (기존 Supabase 구조와 정확히 매칭)
 export const users = pgTable('users', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  email: varchar('email', { length: 255 }).notNull().unique(),
-  name: varchar('name', { length: 255 }).notNull(),
-  companyName: varchar('company_name', { length: 255 }),
+  id: varchar('id').primaryKey(), // cuid2 형태의 기존 ID 사용
+  email: varchar('email', { length: 255 }).notNull(),
+  authProvider: varchar('auth_provider', { length: 50 }),
+  authId: varchar('auth_id', { length: 255 }),
+  userType: userTypeEnum('user_type'),
+  name: varchar('name', { length: 255 }),
   phone: varchar('phone', { length: 50 }),
-  registrationSource: varchar('registration_source', { length: 100 }),
-  isVerified: boolean('is_verified').default(false),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
-  lastLoginAt: timestamp('last_login_at')
+  companyName: varchar('company_name', { length: 255 }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull()
 });
 
-// Inquiries table (기존 Supabase 구조 기반)
+// Inquiries table (실제 Supabase 구조와 정확히 매칭)
 export const inquiries = pgTable('inquiries', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').references(() => users.id).notNull(),
-  type: inquiryTypeEnum('type').notNull(),
-  title: varchar('title', { length: 500 }).notNull(),
-  content: text('content').notNull(),
-  status: inquiryStatusEnum('status').default('pending').notNull(),
-  priority: inquiryPriorityEnum('priority').default('medium').notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
-  resolvedAt: timestamp('resolved_at')
+  id: varchar('id').primaryKey(), // cuid2 형태의 기존 ID 사용
+  userId: varchar('user_id').references(() => users.id).notNull(),
+  inquiryType: inquiryTypeEnum('inquiry_type').notNull(),
+  url: varchar('url', { length: 500 }),
+  companyName: varchar('company_name', { length: 255 }),
+  inquiryMessage: text('inquiry_message'),
+  status: inquiryStatusEnum('status').default('PENDING').notNull(),
+  results: text('results'), // JSON 형태로 저장
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
+  processedAt: timestamp('processed_at', { withTimezone: true })
 });
 
 // Relations
@@ -64,27 +57,29 @@ export const inquiriesRelations = relations(inquiries, ({ one }) => ({
   })
 }));
 
-// Export types for TypeScript
+// Export types for TypeScript (실제 스키마 기반)
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Inquiry = typeof inquiries.$inferSelect;
 export type NewInquiry = typeof inquiries.$inferInsert;
 
-// Join type for user-inquiry data
+// Join type for user-inquiry data (실제 필드명 기반)
 export type UserInquiryJoin = {
   user_id: string;
   user_name: string;
   user_email: string;
-  company_name: string | null;
+  user_company_name: string | null;
   user_registered_at: Date;
-  last_login_at: Date | null;
   inquiry_id: string;
   inquiry_type: string;
-  inquiry_title: string;
+  inquiry_url: string | null;
+  inquiry_company_name: string | null;
+  inquiry_message: string | null;
   inquiry_status: string;
-  priority: string;
+  inquiry_results: string | null;
   inquiry_created_at: Date;
   inquiry_updated_at: Date;
+  inquiry_processed_at: Date | null;
   total_inquiries: number;
-  resolved_inquiries: number;
+  pending_inquiries: number;
 };
