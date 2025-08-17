@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Users, Mail, FileText, TrendingUp } from 'lucide-react';
 
-export default function Home() {
+export default function DashboardPage() {
   // TODO: 실제 데이터는 API에서 가져오기
   const stats = {
     totalUsers: 1234,
