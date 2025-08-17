@@ -94,7 +94,7 @@ export function useEmailHistory() {
 
   // 페이지네이션 업데이트
   const updatePagination = useCallback((newPagination: Partial<typeof pagination>) => {
-    setPagination(prev => ({ ...prev, ...newPagination }));
+    setPagination((prev) => ({ ...prev, ...newPagination }));
   }, []);
 
   // 새로고침

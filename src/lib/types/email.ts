@@ -38,7 +38,7 @@ export const EMAIL_CATEGORIES = [
   'pricing',
   'partnership',
   'welcome',
-  'follow-up'
+  'follow-up',
 ] as const;
 
-export type EmailCategory = typeof EMAIL_CATEGORIES[number];
+export type EmailCategory = (typeof EMAIL_CATEGORIES)[number];

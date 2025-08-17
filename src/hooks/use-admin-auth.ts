@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { adminApi } from '@/lib/utils/admin-api';
-import type { AdminUser, AuthState, LoginRequest } from '@/lib/types';
+import type { AuthState, LoginRequest } from '@/lib/types';
 
 export function useAdminAuth() {
   const [authState, setAuthState] = useState<AuthState>({
@@ -14,10 +14,10 @@ export function useAdminAuth() {
   // 현재 사용자 정보 확인
   const checkAuth = useCallback(async () => {
     try {
-      setAuthState(prev => ({ ...prev, isLoading: true }));
-      
+      setAuthState((prev) => ({ ...prev, isLoading: true }));
+
       const response = await adminApi.getCurrentUser();
-      
+
       if (response.success && response.data) {
         setAuthState({
           user: response.data,
@@ -44,10 +44,10 @@ export function useAdminAuth() {
   // 로그인
   const login = useCallback(async (credentials: LoginRequest) => {
     try {
-      setAuthState(prev => ({ ...prev, isLoading: true }));
-      
+      setAuthState((prev) => ({ ...prev, isLoading: true }));
+
       const response = await adminApi.login(credentials);
-      
+
       if (response.success && response.data) {
         adminApi.setToken(response.data.token);
         setAuthState({
@@ -57,7 +57,7 @@ export function useAdminAuth() {
         });
         return { success: true };
       } else {
-        setAuthState(prev => ({ ...prev, isLoading: false }));
+        setAuthState((prev) => ({ ...prev, isLoading: false }));
         return {
           success: false,
           message: response.message || '로그인에 실패했습니다.',
@@ -65,7 +65,7 @@ export function useAdminAuth() {
       }
     } catch (error) {
       console.error('로그인 오류:', error);
-      setAuthState(prev => ({ ...prev, isLoading: false }));
+      setAuthState((prev) => ({ ...prev, isLoading: false }));
       return {
         success: false,
         message: '로그인 중 오류가 발생했습니다.',

@@ -1,8 +1,6 @@
 // Admin API Client (MVP 버전)
 
 import type {
-  User,
-  Inquiry,
   UserInquiryJoin,
   EmailTemplate,
   EmailSendRequest,
@@ -33,14 +31,11 @@ class AdminApiClient {
   }
 
   // 공통 fetch 메서드
-  private async fetch<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<ApiResponse<T>> {
+  private async fetch<T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
     const url = `${this.baseURL}${endpoint}`;
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...options.headers,
+      ...(options.headers as Record<string, string>),
     };
 
     if (this.token) {
@@ -125,13 +120,11 @@ class AdminApiClient {
       sortBy: sorting.id,
       sortOrder: sorting.desc ? 'desc' : 'asc',
       ...Object.fromEntries(
-        Object.entries(filters).filter(([_, value]) => value != null && value !== '')
+        Object.entries(filters).filter(([, value]) => value != null && value !== '')
       ),
     });
 
-    return this.fetch<PaginatedResponse<UserInquiryJoin>>(
-      `/admin/users-inquiries?${params}`
-    );
+    return this.fetch<PaginatedResponse<UserInquiryJoin>>(`/admin/users-inquiries?${params}`);
   }
 
   async getUserInquiry(id: string): Promise<ApiResponse<UserInquiryJoin>> {
@@ -188,18 +181,18 @@ class AdminApiClient {
       pageSize: pagination.pageSize.toString(),
     });
 
-    return this.fetch<PaginatedResponse<EmailSendHistory>>(
-      `/admin/emails/history?${params}`
-    );
+    return this.fetch<PaginatedResponse<EmailSendHistory>>(`/admin/emails/history?${params}`);
   }
 
   // 대시보드 통계 API
-  async getDashboardStats(): Promise<ApiResponse<{
-    totalUsers: number;
-    totalInquiries: number;
-    emailTemplates: number;
-    emailsSent: number;
-  }>> {
+  async getDashboardStats(): Promise<
+    ApiResponse<{
+      totalUsers: number;
+      totalInquiries: number;
+      emailTemplates: number;
+      emailsSent: number;
+    }>
+  > {
     return this.fetch('/admin/dashboard/stats');
   }
 }

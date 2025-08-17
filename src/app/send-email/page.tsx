@@ -64,8 +64,8 @@ export default function SendEmailPage() {
   const [isPreviewMode, setIsPreviewMode] = useState(false);
 
   const handleUserSelect = (user: User) => {
-    if (selectedUsers.find(u => u.id === user.id)) {
-      setSelectedUsers(selectedUsers.filter(u => u.id !== user.id));
+    if (selectedUsers.find((u) => u.id === user.id)) {
+      setSelectedUsers(selectedUsers.filter((u) => u.id !== user.id));
     } else {
       setSelectedUsers([...selectedUsers, user]);
     }
@@ -82,7 +82,7 @@ export default function SendEmailPage() {
       alert('수신자를 선택해주세요.');
       return;
     }
-    
+
     if (!customSubject.trim() || !customContent.trim()) {
       alert('제목과 내용을 입력해주세요.');
       return;
@@ -90,16 +90,16 @@ export default function SendEmailPage() {
 
     // TODO: 실제 이메일 발송 API 호출
     const emailData = {
-      recipientIds: selectedUsers.map(u => u.id),
-      recipients: selectedUsers.map(u => u.email),
+      recipientIds: selectedUsers.map((u) => u.id),
+      recipients: selectedUsers.map((u) => u.email),
       subject: customSubject,
       content: customContent,
       templateId: selectedTemplate?.id,
     };
-    
+
     console.log('이메일 발송:', emailData);
     alert(`${selectedUsers.length}명에게 이메일을 발송했습니다.`);
-    
+
     // 폼 초기화
     setSelectedUsers([]);
     setSelectedTemplate(null);
@@ -115,9 +115,7 @@ export default function SendEmailPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">이메일 발송</h1>
-        <p className="text-muted-foreground">
-          사용자에게 이메일을 발송합니다.
-        </p>
+        <p className="text-muted-foreground">사용자에게 이메일을 발송합니다.</p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -134,8 +132,8 @@ export default function SendEmailPage() {
               {mockUsers.map((user) => (
                 <div
                   key={user.id}
-                  className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                    selectedUsers.find(u => u.id === user.id)
+                  className={`cursor-pointer rounded-lg border p-3 transition-colors ${
+                    selectedUsers.find((u) => u.id === user.id)
                       ? 'border-primary bg-primary/5'
                       : 'border-border hover:bg-muted/50'
                   }`}
@@ -144,20 +142,20 @@ export default function SendEmailPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="font-medium">{user.name}</div>
-                      <div className="text-sm text-muted-foreground">{user.email}</div>
-                      <div className="text-xs text-muted-foreground">{user.companyName}</div>
+                      <div className="text-muted-foreground text-sm">{user.email}</div>
+                      <div className="text-muted-foreground text-xs">{user.companyName}</div>
                     </div>
-                    {selectedUsers.find(u => u.id === user.id) && (
+                    {selectedUsers.find((u) => u.id === user.id) && (
                       <Badge variant="default">선택됨</Badge>
                     )}
                   </div>
                 </div>
               ))}
             </div>
-            
+
             {selectedUsers.length > 0 && (
-              <div className="mt-4 p-3 bg-muted rounded-lg">
-                <div className="text-sm font-medium mb-2">
+              <div className="bg-muted mt-4 rounded-lg p-3">
+                <div className="mb-2 text-sm font-medium">
                   선택된 수신자 ({selectedUsers.length}명):
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -185,7 +183,7 @@ export default function SendEmailPage() {
               {mockTemplates.map((template) => (
                 <div
                   key={template.id}
-                  className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                  className={`cursor-pointer rounded-lg border p-3 transition-colors ${
                     selectedTemplate?.id === template.id
                       ? 'border-primary bg-primary/5'
                       : 'border-border hover:bg-muted/50'
@@ -193,18 +191,16 @@ export default function SendEmailPage() {
                   onClick={() => handleTemplateSelect(template)}
                 >
                   <div className="font-medium">{template.name}</div>
-                  <div className="text-sm text-muted-foreground mt-1">
-                    {template.subject}
-                  </div>
+                  <div className="text-muted-foreground mt-1 text-sm">{template.subject}</div>
                   <Badge variant="outline" className="mt-2">
                     {template.category}
                   </Badge>
                 </div>
               ))}
             </div>
-            
-            <div className="mt-4 p-3 bg-muted rounded-lg">
-              <div className="text-sm text-muted-foreground">
+
+            <div className="bg-muted mt-4 rounded-lg p-3">
+              <div className="text-muted-foreground text-sm">
                 템플릿을 선택하면 제목과 내용이 자동으로 입력됩니다. 필요에 따라 수정할 수 있습니다.
               </div>
             </div>
@@ -217,10 +213,7 @@ export default function SendEmailPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>이메일 작성</CardTitle>
-            <Button
-              variant="outline"
-              onClick={() => setIsPreviewMode(!isPreviewMode)}
-            >
+            <Button variant="outline" onClick={() => setIsPreviewMode(!isPreviewMode)}>
               <Eye className="mr-2 h-4 w-4" />
               {isPreviewMode ? '편집 모드' : '미리보기'}
             </Button>
@@ -232,18 +225,16 @@ export default function SendEmailPage() {
               <div>
                 <Label>받는 사람:</Label>
                 <div className="mt-1 text-sm">
-                  {selectedUsers.map(u => u.email).join(', ') || '선택된 수신자 없음'}
+                  {selectedUsers.map((u) => u.email).join(', ') || '선택된 수신자 없음'}
                 </div>
               </div>
               <div>
                 <Label>제목:</Label>
-                <div className="mt-1 p-2 border rounded bg-muted/50">
-                  {subject || '제목 없음'}
-                </div>
+                <div className="bg-muted/50 mt-1 rounded border p-2">{subject || '제목 없음'}</div>
               </div>
               <div>
                 <Label>내용:</Label>
-                <div className="mt-1 p-3 border rounded bg-muted/50 whitespace-pre-wrap min-h-[200px]">
+                <div className="bg-muted/50 mt-1 min-h-[200px] rounded border p-3 whitespace-pre-wrap">
                   {content || '내용 없음'}
                 </div>
               </div>
@@ -279,10 +270,10 @@ export default function SendEmailPage() {
       <Card>
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
-            <div className="text-sm text-muted-foreground">
+            <div className="text-muted-foreground text-sm">
               {selectedUsers.length}명의 수신자에게 이메일을 발송합니다.
             </div>
-            <Button 
+            <Button
               onClick={handleSend}
               disabled={selectedUsers.length === 0 || !subject.trim() || !content.trim()}
               className="min-w-[120px]"

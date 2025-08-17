@@ -4,13 +4,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  Users, 
-  Mail, 
-  BarChart3, 
-  Settings,
-  FileText 
-} from 'lucide-react';
+import { Users, Mail, BarChart3, Settings, FileText } from 'lucide-react';
 
 const navigation = [
   {
@@ -48,13 +42,11 @@ export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <div className={cn("pb-12 w-64", className)}>
+    <div className={cn('w-64 pb-12', className)}>
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
           <div className="px-4 py-2">
-            <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
-              Factoreal Admin
-            </h2>
+            <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">Factoreal Admin</h2>
           </div>
           <div className="space-y-1">
             {navigation.map((item) => {
@@ -62,11 +54,8 @@ export function Sidebar({ className }: SidebarProps) {
               return (
                 <Button
                   key={item.name}
-                  variant={isActive ? "secondary" : "ghost"}
-                  className={cn(
-                    "w-full justify-start",
-                    isActive && "bg-muted font-medium"
-                  )}
+                  variant={isActive ? 'secondary' : 'ghost'}
+                  className={cn('w-full justify-start', isActive && 'bg-muted font-medium')}
                   asChild
                 >
                   <Link href={item.href}>

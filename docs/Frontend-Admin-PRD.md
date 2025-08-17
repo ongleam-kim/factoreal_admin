@@ -7,11 +7,13 @@ Factoreal Admin Dashboard는 고객 문의 데이터를 효율적으로 관리�
 ## Product Overview
 
 ### Target Users
+
 - Factoreal 내부 관리자
 - 고객 지원팀
 - 영업팀
 
 ### Core Features
+
 1. **사용자-문의 통합 관리 페이지**: 사용자 정보와 문의 데이터를 조인하여 통합 뷰 제공
 2. **이메일 템플릿 관리 페이지**: 문의별 맞춤 이메일 템플릿 작성 및 발송
 
@@ -20,6 +22,7 @@ Factoreal Admin Dashboard는 고객 문의 데이터를 효율적으로 관리�
 ### Epic 1: 사용자-문의 데이터 관리
 
 **US-001: 통합 데이터 조회**
+
 ```
 As an admin,
 I want to view users and their inquiry data in a single table,
@@ -27,6 +30,7 @@ So that I can efficiently manage customer relationships and understand inquiry p
 ```
 
 **Acceptance Criteria:**
+
 - 사용자 정보(이름, 이메일, 회사명, 등록일)와 문의 정보(문의 유형, 내용, 상태, 등록일)가 하나의 테이블에 표시
 - 페이지네이션 지원 (20개 항목/페이지)
 - 정렬 기능 (등록일, 이름, 회사명 기준)
@@ -34,6 +38,7 @@ So that I can efficiently manage customer relationships and understand inquiry p
 - 검색 기능 (이름, 이메일, 회사명으로 검색)
 
 **US-002: 상세 정보 조회**
+
 ```
 As an admin,
 I want to view detailed information about a specific user and their inquiries,
@@ -41,12 +46,14 @@ So that I can provide personalized customer support.
 ```
 
 **Acceptance Criteria:**
+
 - 테이블 행 클릭 시 상세 정보 모달 표시
 - 사용자의 모든 문의 내역 표시
 - 문의별 응답 상태 및 이력 표시
 - 고객 정보 편집 기능 (연락처, 회사 정보)
 
 **US-003: 데이터 내보내기**
+
 ```
 As an admin,
 I want to export user and inquiry data,
@@ -54,6 +61,7 @@ So that I can analyze trends and create reports.
 ```
 
 **Acceptance Criteria:**
+
 - CSV/Excel 형식으로 데이터 내보내기
 - 현재 필터 조건 적용된 데이터만 내보내기
 - 내보내기 진행 상태 표시
@@ -61,6 +69,7 @@ So that I can analyze trends and create reports.
 ### Epic 2: 이메일 템플릿 관리
 
 **US-004: 템플릿 관리**
+
 ```
 As an admin,
 I want to create and manage email templates,
@@ -68,6 +77,7 @@ So that I can send consistent and professional responses to customer inquiries.
 ```
 
 **Acceptance Criteria:**
+
 - 템플릿 생성, 수정, 삭제 기능
 - 리치 텍스트 에디터 (HTML 지원)
 - 템플릿 변수 지원 ({userName}, {companyName}, {inquiryType} 등)
@@ -75,6 +85,7 @@ So that I can send consistent and professional responses to customer inquiries.
 - 템플릿 카테고리 분류 (문의 유형별)
 
 **US-005: 이메일 발송**
+
 ```
 As an admin,
 I want to send templated emails to users,
@@ -82,6 +93,7 @@ So that I can efficiently respond to inquiries with personalized content.
 ```
 
 **Acceptance Criteria:**
+
 - 문의별 적절한 템플릿 선택
 - 수신자 선택 (단일/다중 선택)
 - 이메일 미리보기 및 편집
@@ -89,6 +101,7 @@ So that I can efficiently respond to inquiries with personalized content.
 - 발송 상태 실시간 확인
 
 **US-006: 이메일 이력 관리**
+
 ```
 As an admin,
 I want to track email sending history,
@@ -96,6 +109,7 @@ So that I can monitor communication with customers and avoid duplicate messages.
 ```
 
 **Acceptance Criteria:**
+
 - 발송된 이메일 목록 조회
 - 발송 상태 (성공/실패/대기) 표시
 - 수신자별 이메일 이력 조회
@@ -104,6 +118,7 @@ So that I can monitor communication with customers and avoid duplicate messages.
 ## UI/UX Specifications
 
 ### Design System
+
 - **컴포넌트 라이브러리**: shadcn/ui + Radix UI
 - **스타일링**: Tailwind CSS
 - **테마**: 다크 테마 기본, 라이트 테마 지원
@@ -131,6 +146,7 @@ So that I can monitor communication with customers and avoid duplicate messages.
 #### 1. 사용자-문의 관리 페이지 (`/admin/users-inquiries`)
 
 **페이지 구성:**
+
 - 페이지 헤더: 제목, 새로고침, 내보내기 버튼
 - 필터 섹션: 문의 유형, 상태, 날짜 범위 선택
 - 검색 바: 이름/이메일/회사명 통합 검색
@@ -138,6 +154,7 @@ So that I can monitor communication with customers and avoid duplicate messages.
 - 상세 정보 모달: 사용자 및 문의 상세 정보
 
 **테이블 컬럼:**
+
 1. 사용자명 (정렬 가능)
 2. 이메일 (정렬 가능)
 3. 회사명 (정렬 가능)
@@ -147,6 +164,7 @@ So that I can monitor communication with customers and avoid duplicate messages.
 7. 액션 (상세보기, 이메일 발송)
 
 **상호작용:**
+
 - 행 클릭: 상세 정보 모달 열기
 - 컬럼 헤더 클릭: 정렬 방향 변경
 - 액션 버튼: 이메일 발송 페이지로 이동
@@ -154,12 +172,14 @@ So that I can monitor communication with customers and avoid duplicate messages.
 #### 2. 이메일 템플릿 관리 페이지 (`/admin/email-templates`)
 
 **페이지 구성:**
+
 - 템플릿 목록 (카드 레이아웃)
 - 템플릿 에디터 (모달/사이드패널)
 - 미리보기 기능
 - 템플릿 분류 필터
 
 **템플릿 에디터 기능:**
+
 - 리치 텍스트 에디터 (TinyMCE/Quill)
 - 변수 삽입 버튼 ({userName}, {companyName} 등)
 - 실시간 미리보기
@@ -168,6 +188,7 @@ So that I can monitor communication with customers and avoid duplicate messages.
 #### 3. 이메일 발송 페이지 (`/admin/send-email`)
 
 **페이지 구성:**
+
 - 수신자 선택 (검색 가능한 드롭다운)
 - 템플릿 선택
 - 이메일 에디터 (템플릿 기반)
@@ -177,6 +198,7 @@ So that I can monitor communication with customers and avoid duplicate messages.
 ## Technical Architecture
 
 ### Tech Stack
+
 - **프레임워크**: Next.js 15.3.1 (App Router)
 - **UI 라이브러리**: React 19
 - **타입스크립트**: 엄격 모드
@@ -187,6 +209,7 @@ So that I can monitor communication with customers and avoid duplicate messages.
 - **애니메이션**: Framer Motion
 
 ### Project Structure
+
 ```
 src/
 ├── app/
@@ -236,6 +259,7 @@ src/
 ## Component Specifications
 
 ### 1. AdminLayout (`/src/app/admin/layout.tsx`)
+
 ```typescript
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -249,6 +273,7 @@ interface AdminLayoutProps {
 ```
 
 ### 2. DataTable (`/src/app/admin/users-inquiries/components/data-table.tsx`)
+
 ```typescript
 interface DataTableProps {
   data: UserInquiryJoin[];
@@ -268,6 +293,7 @@ interface DataTableProps {
 ```
 
 ### 3. TemplateEditor (`/src/app/admin/email-templates/components/template-editor.tsx`)
+
 ```typescript
 interface TemplateEditorProps {
   template?: EmailTemplate;
@@ -285,6 +311,7 @@ interface TemplateEditorProps {
 ```
 
 ### 4. EmailComposer (`/src/app/admin/send-email/components/email-composer.tsx`)
+
 ```typescript
 interface EmailComposerProps {
   selectedRecipients: User[];
@@ -304,6 +331,7 @@ interface EmailComposerProps {
 ## Data Types
 
 ### Core Data Interfaces
+
 ```typescript
 interface User {
   id: string;
@@ -359,18 +387,21 @@ type InquiryStatus = 'pending' | 'in_progress' | 'resolved' | 'closed';
 ## Performance Requirements
 
 ### Loading Performance
+
 - 초기 페이지 로드: < 2초
 - 데이터 테이블 렌더링: < 1초
 - 이메일 템플릿 미리보기: < 500ms
 - 검색 결과 표시: < 300ms
 
 ### Data Handling
+
 - 페이지네이션: 20개 항목/페이지
 - 가상화된 스크롤 (1000+ 항목일 때)
 - 무한 스크롤 옵션
 - 클라이언트 사이드 캐싱
 
 ### Responsive Design
+
 - 모바일: 768px 이하
 - 태블릿: 768px - 1024px
 - 데스크톱: 1024px 이상
@@ -379,18 +410,21 @@ type InquiryStatus = 'pending' | 'in_progress' | 'resolved' | 'closed';
 ## Security Considerations
 
 ### Authentication & Authorization
+
 - JWT 기반 관리자 인증
 - 역할 기반 접근 제어 (RBAC)
 - 세션 타임아웃 (30분)
 - 자동 로그아웃 기능
 
 ### Data Protection
+
 - 민감한 데이터 마스킹
 - 클라이언트 사이드 입력 검증
 - XSS 방지를 위한 HTML 새니타이제이션
 - CSRF 토큰 검증
 
 ### Audit Logging
+
 - 관리자 액션 로깅
 - 이메일 발송 기록
 - 데이터 내보내기 기록
@@ -399,6 +433,7 @@ type InquiryStatus = 'pending' | 'in_progress' | 'resolved' | 'closed';
 ## Localization Requirements
 
 ### Language Support
+
 - **언어**: 한국어
 - 날짜/시간 한국 표준 포맷
 - 숫자 포맷 한국 표준
@@ -406,6 +441,7 @@ type InquiryStatus = 'pending' | 'in_progress' | 'resolved' | 'closed';
 ## Accessibility Requirements
 
 ### WCAG 2.1 AA 준수
+
 - 키보드 네비게이션 지원
 - 스크린 리더 호환성
 - 충분한 색상 대비 (4.5:1)
@@ -413,6 +449,7 @@ type InquiryStatus = 'pending' | 'in_progress' | 'resolved' | 'closed';
 - ARIA 라벨 및 역할
 
 ### Usability Features
+
 - 로딩 상태 표시
 - 에러 메시지 명확성
 - 성공 피드백 제공
@@ -421,18 +458,21 @@ type InquiryStatus = 'pending' | 'in_progress' | 'resolved' | 'closed';
 ## Testing Strategy
 
 ### Unit Testing
+
 - 컴포넌트 렌더링 테스트
 - 훅 로직 테스트
 - 유틸리티 함수 테스트
 - 폼 검증 테스트
 
 ### Integration Testing
+
 - API 호출 테스트
 - 페이지 네비게이션 테스트
 - 데이터 플로우 테스트
 - 인증 플로우 테스트
 
 ### Performance Testing
+
 - 라이트하우스 점수 90+ 목표
 - 대용량 데이터 처리 테스트
 - 메모리 누수 검사
@@ -441,12 +481,14 @@ type InquiryStatus = 'pending' | 'in_progress' | 'resolved' | 'closed';
 ## Deployment & Monitoring
 
 ### Build & Deployment
+
 - Next.js 프로덕션 빌드
 - 정적 자산 최적화
 - 코드 스플리팅
 - 환경별 설정 관리
 
 ### Monitoring
+
 - 에러 추적 (Sentry)
 - 성능 모니터링
 - 사용자 행동 분석
@@ -455,12 +497,14 @@ type InquiryStatus = 'pending' | 'in_progress' | 'resolved' | 'closed';
 ## Future Enhancements
 
 ### Phase 2 Features
+
 - 실시간 알림 시스템
 - 대시보드 위젯 커스터마이징
 - 고급 필터링 및 정렬
 - 이메일 A/B 테스팅
 
 ### Phase 3 Features
+
 - 모바일 앱 지원
 - API 키 관리
 - 워크플로우 자동화

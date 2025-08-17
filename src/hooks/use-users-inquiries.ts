@@ -2,13 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { adminApi } from '@/lib/utils/admin-api';
-import type {
-  UserInquiryJoin,
-  TableFilters,
-  PaginationState,
-  SortingState,
-  PaginatedResponse,
-} from '@/lib/types';
+import type { UserInquiryJoin, TableFilters, PaginationState, SortingState } from '@/lib/types';
 
 interface UseUsersInquiriesOptions {
   initialFilters?: TableFilters;
@@ -21,10 +15,8 @@ export function useUsersInquiries(options: UseUsersInquiriesOptions = {}) {
   const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
-  const [filters, setFilters] = useState<TableFilters>(
-    options.initialFilters || {}
-  );
+
+  const [filters, setFilters] = useState<TableFilters>(options.initialFilters || {});
   const [pagination, setPagination] = useState<PaginationState>(
     options.initialPagination || { pageIndex: 0, pageSize: 20 }
   );
@@ -60,25 +52,28 @@ export function useUsersInquiries(options: UseUsersInquiriesOptions = {}) {
 
   // 필터 업데이트
   const updateFilters = useCallback((newFilters: Partial<TableFilters>) => {
-    setFilters(prev => ({ ...prev, ...newFilters }));
-    setPagination(prev => ({ ...prev, pageIndex: 0 })); // 필터 변경시 첫 페이지로
+    setFilters((prev) => ({ ...prev, ...newFilters }));
+    setPagination((prev) => ({ ...prev, pageIndex: 0 })); // 필터 변경시 첫 페이지로
   }, []);
 
   // 페이지네이션 업데이트
   const updatePagination = useCallback((newPagination: Partial<PaginationState>) => {
-    setPagination(prev => ({ ...prev, ...newPagination }));
+    setPagination((prev) => ({ ...prev, ...newPagination }));
   }, []);
 
   // 정렬 업데이트
   const updateSorting = useCallback((newSorting: SortingState) => {
     setSorting(newSorting);
-    setPagination(prev => ({ ...prev, pageIndex: 0 })); // 정렬 변경시 첫 페이지로
+    setPagination((prev) => ({ ...prev, pageIndex: 0 })); // 정렬 변경시 첫 페이지로
   }, []);
 
   // 검색
-  const search = useCallback((searchTerm: string) => {
-    updateFilters({ search: searchTerm });
-  }, [updateFilters]);
+  const search = useCallback(
+    (searchTerm: string) => {
+      updateFilters({ search: searchTerm });
+    },
+    [updateFilters]
+  );
 
   // 새로고침
   const refresh = useCallback(() => {

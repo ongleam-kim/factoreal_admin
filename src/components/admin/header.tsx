@@ -29,29 +29,25 @@ export function Header({ user, onLogout }: HeaderProps) {
 
   return (
     <header className="border-b">
-      <div className="flex h-16 items-center px-4 justify-between">
+      <div className="flex h-16 items-center justify-between px-4">
         <div className="flex items-center space-x-4">
           <h1 className="text-xl font-semibold">관리자 대시보드</h1>
         </div>
-        
+
         <div className="flex items-center space-x-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                 <Avatar className="h-8 w-8">
-                  <AvatarFallback>
-                    {user?.name?.charAt(0) || 'A'}
-                  </AvatarFallback>
+                  <AvatarFallback>{user?.name?.charAt(0) || 'A'}</AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">
-                    {user?.name || '관리자'}
-                  </p>
-                  <p className="text-xs leading-none text-muted-foreground">
+                  <p className="text-sm leading-none font-medium">{user?.name || '관리자'}</p>
+                  <p className="text-muted-foreground text-xs leading-none">
                     {user?.email || 'admin@factoreal.com'}
                   </p>
                 </div>

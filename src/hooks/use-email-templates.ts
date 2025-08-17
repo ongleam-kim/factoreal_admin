@@ -33,59 +33,61 @@ export function useEmailTemplates() {
   }, []);
 
   // 템플릿 생성
-  const createTemplate = useCallback(async (
-    templateData: Omit<EmailTemplate, 'id' | 'createdAt' | 'updatedAt'>
-  ) => {
-    try {
-      const response = await adminApi.createEmailTemplate(templateData);
+  const createTemplate = useCallback(
+    async (templateData: Omit<EmailTemplate, 'id' | 'createdAt' | 'updatedAt'>) => {
+      try {
+        const response = await adminApi.createEmailTemplate(templateData);
 
-      if (response.success && response.data) {
-        setTemplates(prev => [...prev, response.data!]);
-        return { success: true, data: response.data };
-      } else {
+        if (response.success && response.data) {
+          setTemplates((prev) => [...prev, response.data!]);
+          return { success: true, data: response.data };
+        } else {
+          return {
+            success: false,
+            message: response.message || '템플릿 생성에 실패했습니다.',
+          };
+        }
+      } catch (err) {
+        console.error('템플릿 생성 오류:', err);
         return {
           success: false,
-          message: response.message || '템플릿 생성에 실패했습니다.',
+          message: '템플릿 생성 중 오류가 발생했습니다.',
         };
       }
-    } catch (err) {
-      console.error('템플릿 생성 오류:', err);
-      return {
-        success: false,
-        message: '템플릿 생성 중 오류가 발생했습니다.',
-      };
-    }
-  }, []);
+    },
+    []
+  );
 
   // 템플릿 수정
-  const updateTemplate = useCallback(async (
-    id: string,
-    templateData: Partial<Omit<EmailTemplate, 'id' | 'createdAt' | 'updatedAt'>>
-  ) => {
-    try {
-      const response = await adminApi.updateEmailTemplate(id, templateData);
+  const updateTemplate = useCallback(
+    async (
+      id: string,
+      templateData: Partial<Omit<EmailTemplate, 'id' | 'createdAt' | 'updatedAt'>>
+    ) => {
+      try {
+        const response = await adminApi.updateEmailTemplate(id, templateData);
 
-      if (response.success && response.data) {
-        setTemplates(prev =>
-          prev.map(template =>
-            template.id === id ? response.data! : template
-          )
-        );
-        return { success: true, data: response.data };
-      } else {
+        if (response.success && response.data) {
+          setTemplates((prev) =>
+            prev.map((template) => (template.id === id ? response.data! : template))
+          );
+          return { success: true, data: response.data };
+        } else {
+          return {
+            success: false,
+            message: response.message || '템플릿 수정에 실패했습니다.',
+          };
+        }
+      } catch (err) {
+        console.error('템플릿 수정 오류:', err);
         return {
           success: false,
-          message: response.message || '템플릿 수정에 실패했습니다.',
+          message: '템플릿 수정 중 오류가 발생했습니다.',
         };
       }
-    } catch (err) {
-      console.error('템플릿 수정 오류:', err);
-      return {
-        success: false,
-        message: '템플릿 수정 중 오류가 발생했습니다.',
-      };
-    }
-  }, []);
+    },
+    []
+  );
 
   // 템플릿 삭제
   const deleteTemplate = useCallback(async (id: string) => {
@@ -93,7 +95,7 @@ export function useEmailTemplates() {
       const response = await adminApi.deleteEmailTemplate(id);
 
       if (response.success) {
-        setTemplates(prev => prev.filter(template => template.id !== id));
+        setTemplates((prev) => prev.filter((template) => template.id !== id));
         return { success: true };
       } else {
         return {
@@ -111,14 +113,20 @@ export function useEmailTemplates() {
   }, []);
 
   // 특정 템플릿 조회
-  const getTemplate = useCallback((id: string) => {
-    return templates.find(template => template.id === id) || null;
-  }, [templates]);
+  const getTemplate = useCallback(
+    (id: string) => {
+      return templates.find((template) => template.id === id) || null;
+    },
+    [templates]
+  );
 
   // 카테고리별 템플릿 필터링
-  const getTemplatesByCategory = useCallback((category: string) => {
-    return templates.filter(template => template.category === category);
-  }, [templates]);
+  const getTemplatesByCategory = useCallback(
+    (category: string) => {
+      return templates.filter((template) => template.category === category);
+    },
+    [templates]
+  );
 
   // 새로고침
   const refresh = useCallback(() => {

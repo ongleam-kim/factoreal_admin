@@ -102,13 +102,13 @@ const getTypeBadge = (type: InquiryType) => {
     pricing: '가격',
     partnership: '파트너십',
   };
-  
+
   return <Badge variant="outline">{typeLabels[type]}</Badge>;
 };
 
 export default function UsersInquiriesPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [data, setData] = useState(mockData);
+  const [data] = useState(mockData);
 
   const filteredData = data.filter(
     (item) =>
@@ -133,9 +133,7 @@ export default function UsersInquiriesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">사용자 & 문의 관리</h1>
-          <p className="text-muted-foreground">
-            사용자 정보와 문의 내역을 통합 관리합니다.
-          </p>
+          <p className="text-muted-foreground">사용자 정보와 문의 내역을 통합 관리합니다.</p>
         </div>
         <Button onClick={handleRefresh} variant="outline">
           <RefreshCw className="mr-2 h-4 w-4" />
@@ -150,7 +148,7 @@ export default function UsersInquiriesPage() {
         <CardContent>
           <div className="flex items-center space-x-2">
             <div className="relative flex-1">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Search className="text-muted-foreground absolute top-2.5 left-2 h-4 w-4" />
               <Input
                 placeholder="이름, 이메일, 회사명, 문의 제목으로 검색..."
                 value={searchTerm}
@@ -185,31 +183,23 @@ export default function UsersInquiriesPage() {
                   <TableCell>
                     <div>
                       <div className="font-medium">{item.user.name}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {item.user.email}
-                      </div>
+                      <div className="text-muted-foreground text-sm">{item.user.email}</div>
                     </div>
                   </TableCell>
                   <TableCell>{item.user.companyName || '-'}</TableCell>
                   <TableCell>{getTypeBadge(item.inquiry.type)}</TableCell>
                   <TableCell>
                     <div className="max-w-xs">
-                      <div className="font-medium truncate">{item.inquiry.title}</div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="truncate font-medium">{item.inquiry.title}</div>
+                      <div className="text-muted-foreground text-sm">
                         응답 {item.inquiry.responseCount}회
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>{getStatusBadge(item.inquiry.status)}</TableCell>
+                  <TableCell>{item.inquiry.createdAt.toLocaleDateString('ko-KR')}</TableCell>
                   <TableCell>
-                    {item.inquiry.createdAt.toLocaleDateString('ko-KR')}
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleSendEmail(item)}
-                    >
+                    <Button variant="outline" size="sm" onClick={() => handleSendEmail(item)}>
                       <Mail className="mr-2 h-4 w-4" />
                       이메일
                     </Button>
@@ -218,9 +208,9 @@ export default function UsersInquiriesPage() {
               ))}
             </TableBody>
           </Table>
-          
+
           {filteredData.length === 0 && (
-            <div className="text-center py-8">
+            <div className="py-8 text-center">
               <p className="text-muted-foreground">검색 결과가 없습니다.</p>
             </div>
           )}

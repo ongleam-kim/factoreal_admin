@@ -21,7 +21,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Plus, Edit, Trash2, Mail } from 'lucide-react';
@@ -51,7 +50,8 @@ const mockTemplates: EmailTemplate[] = [
     id: '3',
     name: '환영 이메일',
     subject: 'Factoreal에 오신 것을 환영합니다',
-    content: '안녕하세요.\n\nFactoreal 서비스에 가입해주셔서 감사합니다.\n\n앞으로 좋은 서비스를 제공하겠습니다.',
+    content:
+      '안녕하세요.\n\nFactoreal 서비스에 가입해주셔서 감사합니다.\n\n앞으로 좋은 서비스를 제공하겠습니다.',
     category: 'welcome',
     createdAt: new Date('2024-01-08'),
     updatedAt: new Date('2024-01-15'),
@@ -74,7 +74,7 @@ const getCategoryBadge = (category: string) => {
     welcome: '환영',
     'follow-up': '후속',
   };
-  
+
   return <Badge variant="outline">{categoryLabels[category] || category}</Badge>;
 };
 
@@ -114,11 +114,11 @@ export default function EmailTemplatesPage() {
   const handleSave = () => {
     if (editingTemplate) {
       // 수정
-      setTemplates(templates.map(t => 
-        t.id === editingTemplate.id 
-          ? { ...t, ...formData, updatedAt: new Date() }
-          : t
-      ));
+      setTemplates(
+        templates.map((t) =>
+          t.id === editingTemplate.id ? { ...t, ...formData, updatedAt: new Date() } : t
+        )
+      );
     } else {
       // 생성
       const newTemplate: EmailTemplate = {
@@ -134,7 +134,7 @@ export default function EmailTemplatesPage() {
 
   const handleDelete = (id: string) => {
     if (confirm('정말 삭제하시겠습니까?')) {
-      setTemplates(templates.filter(t => t.id !== id));
+      setTemplates(templates.filter((t) => t.id !== id));
     }
   };
 
@@ -148,13 +148,10 @@ export default function EmailTemplatesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">이메일 템플릿 관리</h1>
-          <p className="text-muted-foreground">
-            이메일 템플릿을 생성하고 관리합니다.
-          </p>
+          <p className="text-muted-foreground">이메일 템플릿을 생성하고 관리합니다.</p>
         </div>
         <Button onClick={handleCreate}>
-          <Plus className="mr-2 h-4 w-4" />
-          새 템플릿
+          <Plus className="mr-2 h-4 w-4" />새 템플릿
         </Button>
       </div>
 
@@ -182,12 +179,8 @@ export default function EmailTemplatesPage() {
                     <div className="max-w-xs truncate">{template.subject}</div>
                   </TableCell>
                   <TableCell>{getCategoryBadge(template.category)}</TableCell>
-                  <TableCell>
-                    {template.createdAt.toLocaleDateString('ko-KR')}
-                  </TableCell>
-                  <TableCell>
-                    {template.updatedAt.toLocaleDateString('ko-KR')}
-                  </TableCell>
+                  <TableCell>{template.createdAt.toLocaleDateString('ko-KR')}</TableCell>
+                  <TableCell>{template.updatedAt.toLocaleDateString('ko-KR')}</TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-2">
                       <Button
@@ -197,18 +190,10 @@ export default function EmailTemplatesPage() {
                       >
                         <Mail className="h-4 w-4" />
                       </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEdit(template)}
-                      >
+                      <Button variant="outline" size="sm" onClick={() => handleEdit(template)}>
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDelete(template.id)}
-                      >
+                      <Button variant="outline" size="sm" onClick={() => handleDelete(template.id)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
@@ -223,12 +208,8 @@ export default function EmailTemplatesPage() {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[625px]">
           <DialogHeader>
-            <DialogTitle>
-              {editingTemplate ? '템플릿 수정' : '새 템플릿 생성'}
-            </DialogTitle>
-            <DialogDescription>
-              이메일 템플릿 정보를 입력하세요.
-            </DialogDescription>
+            <DialogTitle>{editingTemplate ? '템플릿 수정' : '새 템플릿 생성'}</DialogTitle>
+            <DialogDescription>이메일 템플릿 정보를 입력하세요.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
@@ -238,7 +219,7 @@ export default function EmailTemplatesPage() {
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="col-span-3"
               />
             </div>
@@ -249,7 +230,7 @@ export default function EmailTemplatesPage() {
               <Input
                 id="subject"
                 value={formData.subject}
-                onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                 className="col-span-3"
               />
             </div>
@@ -260,8 +241,8 @@ export default function EmailTemplatesPage() {
               <select
                 id="category"
                 value={formData.category}
-                onChange={(e) => setFormData({...formData, category: e.target.value})}
-                className="col-span-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                className="border-input bg-background ring-offset-background col-span-3 flex h-10 w-full rounded-md border px-3 py-2 text-sm"
               >
                 <option value="general">일반</option>
                 <option value="technical">기술</option>
@@ -272,13 +253,13 @@ export default function EmailTemplatesPage() {
               </select>
             </div>
             <div className="grid grid-cols-4 items-start gap-4">
-              <Label htmlFor="content" className="text-right mt-2">
+              <Label htmlFor="content" className="mt-2 text-right">
                 내용
               </Label>
               <Textarea
                 id="content"
                 value={formData.content}
-                onChange={(e) => setFormData({...formData, content: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 className="col-span-3 min-h-[120px]"
                 placeholder="이메일 내용을 입력하세요..."
               />
