@@ -90,14 +90,14 @@ class AdminApiClient {
 
   // 인증 관련 API
   async login(credentials: LoginRequest): Promise<ApiResponse<LoginResponse>> {
-    return this.fetch<LoginResponse>('/admin/auth/login', {
+    return this.fetch<LoginResponse>('/auth/signin', {
       method: 'POST',
       body: JSON.stringify(credentials),
     });
   }
 
   async logout(): Promise<ApiResponse<void>> {
-    const result = await this.fetch<void>('/admin/auth/logout', {
+    const result = await this.fetch<void>('/auth/signout', {
       method: 'POST',
     });
     this.removeToken();
@@ -105,7 +105,7 @@ class AdminApiClient {
   }
 
   async getCurrentUser(): Promise<ApiResponse<AdminUser>> {
-    return this.fetch<AdminUser>('/admin/auth/me');
+    return this.fetch<AdminUser>('/auth/me');
   }
 
   // 사용자 & 문의 관리 API
@@ -124,11 +124,11 @@ class AdminApiClient {
       ),
     });
 
-    return this.fetch<PaginatedResponse<UserInquiryJoin>>(`/admin/users-inquiries?${params}`);
+    return this.fetch<PaginatedResponse<UserInquiryJoin>>(`/data/users-inquiries?${params}`);
   }
 
   async getUserInquiry(id: string): Promise<ApiResponse<UserInquiryJoin>> {
-    return this.fetch<UserInquiryJoin>(`/admin/users-inquiries/${id}`);
+    return this.fetch<UserInquiryJoin>(`/data/users-inquiries/${id}`);
   }
 
   // 이메일 템플릿 관리 API
@@ -193,7 +193,7 @@ class AdminApiClient {
       emailsSent: number;
     }>
   > {
-    return this.fetch('/admin/dashboard/stats');
+    return this.fetch('/analytics/dashboard');
   }
 }
 
