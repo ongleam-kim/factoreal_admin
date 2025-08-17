@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -14,71 +14,30 @@ import {
 } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Search, Mail, RefreshCw } from 'lucide-react';
-import type { UserInquiryJoin, InquiryStatus, InquiryType } from '@/lib/types';
+// 타입 정의
+type InquiryStatus = 'pending' | 'in_progress' | 'resolved' | 'closed';
+type InquiryType = 'general' | 'technical' | 'pricing' | 'partnership';
 
-// Mock data for MVP - 실제로는 API에서 가져올 데이터
-const mockData: UserInquiryJoin[] = [
-  {
-    user: {
-      id: '1',
-      name: '김철수',
-      email: 'kim@example.com',
-      companyName: '테크컴퍼니',
-      registeredAt: new Date('2024-01-15'),
-    },
-    inquiry: {
-      id: '1',
-      userId: '1',
-      type: 'technical',
-      title: 'API 연동 관련 문의',
-      content: 'REST API 연동 방법에 대해 문의드립니다.',
-      status: 'pending',
-      createdAt: new Date('2024-01-20'),
-      updatedAt: new Date('2024-01-20'),
-      responseCount: 0,
-    },
-  },
-  {
-    user: {
-      id: '2',
-      name: '이영희',
-      email: 'lee@example.com',
-      companyName: '디자인스튜디오',
-      registeredAt: new Date('2024-01-10'),
-    },
-    inquiry: {
-      id: '2',
-      userId: '2',
-      type: 'pricing',
-      title: '가격 정책 문의',
-      content: '엔터프라이즈 플랜 가격에 대해 문의드립니다.',
-      status: 'in_progress',
-      createdAt: new Date('2024-01-18'),
-      updatedAt: new Date('2024-01-19'),
-      responseCount: 2,
-    },
-  },
-  {
-    user: {
-      id: '3',
-      name: '박민수',
-      email: 'park@example.com',
-      companyName: '스타트업',
-      registeredAt: new Date('2024-01-05'),
-    },
-    inquiry: {
-      id: '3',
-      userId: '3',
-      type: 'partnership',
-      title: '파트너십 제안',
-      content: '비즈니스 파트너십에 대해 논의하고 싶습니다.',
-      status: 'resolved',
-      createdAt: new Date('2024-01-16'),
-      updatedAt: new Date('2024-01-17'),
-      responseCount: 1,
-    },
-  },
-];
+interface UserInquiryJoin {
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    companyName: string | null;
+    registeredAt: Date;
+  };
+  inquiry: {
+    id: string;
+    userId: string;
+    type: InquiryType;
+    title: string;
+    content: string;
+    status: InquiryStatus;
+    createdAt: Date;
+    updatedAt: Date;
+    responseCount: number;
+  };
+}
 
 const getStatusBadge = (status: InquiryStatus) => {
   switch (status) {
@@ -108,19 +67,65 @@ const getTypeBadge = (type: InquiryType) => {
 
 export default function UsersInquiriesPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [data] = useState(mockData);
+  const [data, setData] = useState<UserInquiryJoin[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [total, setTotal] = useState(0);
 
-  const filteredData = data.filter(
-    (item) =>
-      item.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.user.companyName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.inquiry.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const fetchData = async (search: string = '') => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams();
+      if (search) params.append('search', search);
+      params.append('limit', '50');
+      params.append('offset', '0');
+      
+      const response = await fetch(`/api/users-inquiries?${params.toString()}`);
+      const result = await response.json();
+      
+      if (result.success) {
+        // Date 문자열을 Date 객체로 변환
+        const transformedData = result.data.items.map((item: any) => ({
+          ...item,
+          user: {
+            ...item.user,
+            registeredAt: new Date(item.user.registeredAt)
+          },
+          inquiry: {
+            ...item.inquiry,
+            createdAt: new Date(item.inquiry.createdAt),
+            updatedAt: new Date(item.inquiry.updatedAt)
+          }
+        }));
+        setData(transformedData);
+        setTotal(result.data.total);
+      } else {
+        console.error('데이터 로딩 실패:', result.error);
+        setData([]);
+        setTotal(0);
+      }
+    } catch (error) {
+      console.error('API 호출 실패:', error);
+      setData([]);
+      setTotal(0);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData(searchTerm);
+  }, []);
+
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      fetchData(searchTerm);
+    }, 300);
+    
+    return () => clearTimeout(debounceTimer);
+  }, [searchTerm]);
 
   const handleRefresh = () => {
-    // TODO: API 호출로 데이터 새로고침
-    console.log('데이터 새로고침');
+    fetchData(searchTerm);
   };
 
   const handleSendEmail = (userInquiry: UserInquiryJoin) => {
@@ -162,7 +167,10 @@ export default function UsersInquiriesPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>사용자 & 문의 목록</CardTitle>
+          <CardTitle>
+            사용자 & 문의 목록 
+            {!loading && <span className="text-muted-foreground text-sm ml-2">({total}건)</span>}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
@@ -178,7 +186,25 @@ export default function UsersInquiriesPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredData.map((item) => (
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-8">
+                    <div className="flex items-center justify-center">
+                      <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                      데이터를 로딩 중입니다...
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : data.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-8">
+                    <p className="text-muted-foreground">
+                      {searchTerm ? '검색 결과가 없습니다.' : '문의가 없습니다.'}
+                    </p>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                data.map((item) => (
                 <TableRow key={item.inquiry.id}>
                   <TableCell>
                     <div>
@@ -205,15 +231,10 @@ export default function UsersInquiriesPage() {
                     </Button>
                   </TableCell>
                 </TableRow>
-              ))}
+                ))
+              )}
             </TableBody>
           </Table>
-
-          {filteredData.length === 0 && (
-            <div className="py-8 text-center">
-              <p className="text-muted-foreground">검색 결과가 없습니다.</p>
-            </div>
-          )}
         </CardContent>
       </Card>
     </div>
