@@ -15,27 +15,27 @@ import {
 const navigation = [
   {
     name: '대시보드',
-    href: '/admin/dashboard',
+    href: '/',
     icon: BarChart3,
   },
   {
     name: '사용자 관리',
-    href: '/admin/users-inquiries',
+    href: '/users-inquiries',
     icon: Users,
   },
   {
     name: '이메일 템플릿',
-    href: '/admin/email-templates',
+    href: '/email-templates',
     icon: FileText,
   },
   {
     name: '이메일 발송',
-    href: '/admin/send-email',
+    href: '/send-email',
     icon: Mail,
   },
   {
     name: '설정',
-    href: '/admin/settings',
+    href: '/settings',
     icon: Settings,
   },
 ];

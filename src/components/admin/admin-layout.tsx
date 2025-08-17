@@ -8,7 +8,7 @@ interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
-export default function AdminLayout({ children }: AdminLayoutProps) {
+export function AdminLayout({ children }: AdminLayoutProps) {
   // TODO: 실제 인증 상태 관리는 나중에 구현
   const [user] = useState({
     name: '관리자',
