@@ -4,16 +4,13 @@ import { relations } from 'drizzle-orm';
 // Enums for type safety (기존 DB에 맞게 수정)
 export const userTypeEnum = pgEnum('UserType', ['GUEST', 'AUTHENTICATED']);
 
-export const inquiryTypeEnum = pgEnum('InquiryType', [
-  'URL_VERIFICATION',
-  'GENERAL_INQUIRY'
-]);
+export const inquiryTypeEnum = pgEnum('InquiryType', ['URL_VERIFICATION', 'GENERAL_INQUIRY']);
 
 export const inquiryStatusEnum = pgEnum('InquiryStatus', [
   'PENDING',
-  'PROCESSING', 
+  'PROCESSING',
   'RESOLVED',
-  'CLOSED'
+  'CLOSED',
 ]);
 
 // Users table (기존 Supabase 구조와 정확히 매칭)
@@ -27,13 +24,15 @@ export const users = pgTable('users', {
   phone: varchar('phone', { length: 50 }),
   companyName: varchar('company_name', { length: 255 }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull()
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
 });
 
 // Inquiries table (실제 Supabase 구조와 정확히 매칭)
 export const inquiries = pgTable('inquiries', {
   id: varchar('id').primaryKey(), // cuid2 형태의 기존 ID 사용
-  userId: varchar('user_id').references(() => users.id).notNull(),
+  userId: varchar('user_id')
+    .references(() => users.id)
+    .notNull(),
   inquiryType: inquiryTypeEnum('inquiry_type').notNull(),
   url: varchar('url', { length: 500 }),
   companyName: varchar('company_name', { length: 255 }),
@@ -42,19 +41,19 @@ export const inquiries = pgTable('inquiries', {
   results: text('results'), // JSON 형태로 저장
   createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
-  processedAt: timestamp('processed_at', { withTimezone: true })
+  processedAt: timestamp('processed_at', { withTimezone: true }),
 });
 
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
-  inquiries: many(inquiries)
+  inquiries: many(inquiries),
 }));
 
 export const inquiriesRelations = relations(inquiries, ({ one }) => ({
   user: one(users, {
     fields: [inquiries.userId],
-    references: [users.id]
-  })
+    references: [users.id],
+  }),
 }));
 
 // Export types for TypeScript (실제 스키마 기반)

@@ -3,7 +3,7 @@ import { createSupabaseServerClient } from '@/lib/db/supabase';
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
 
     // Sign out from Supabase
     const { error } = await supabase.auth.signOut();
@@ -11,9 +11,9 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error('Signout error:', error);
       return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Failed to sign out' 
+        {
+          success: false,
+          error: 'Failed to sign out',
         },
         { status: 500 }
       );
@@ -21,15 +21,14 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Successfully signed out'
+      message: 'Successfully signed out',
     });
-
   } catch (error) {
     console.error('Signout error:', error);
     return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Internal server error' 
+      {
+        success: false,
+        error: 'Internal server error',
       },
       { status: 500 }
     );

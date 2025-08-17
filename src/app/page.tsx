@@ -30,21 +30,22 @@ async function getDashboardData(): Promise<{
 } | null> {
   try {
     const supabase = createSupabaseAdminClient();
-    
+
     // 총 사용자 수
     const { count: totalUsers } = await supabase
       .from('users')
       .select('*', { count: 'exact', head: true });
-    
+
     // 총 문의 수
     const { count: totalInquiries } = await supabase
       .from('inquiries')
       .select('*', { count: 'exact', head: true });
-    
+
     // 최근 문의 5개 (사용자 정보와 함께)
     const { data: recentInquiries } = await supabase
       .from('inquiries')
-      .select(`
+      .select(
+        `
         id,
         inquiry_type,
         inquiry_message,
@@ -54,31 +55,43 @@ async function getDashboardData(): Promise<{
           name,
           email
         )
-      `)
+      `
+      )
       .order('created_at', { ascending: false })
       .limit(5);
-    
+
     // 상태별 문의 수
-    const { data: statusCounts } = await supabase
-      .from('inquiries')
-      .select('status');
-    
-    const statusStats = statusCounts?.reduce((acc, inquiry) => {
-      acc[inquiry.status] = (acc[inquiry.status] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>) || {};
-    
+    const { data: statusCounts } = await supabase.from('inquiries').select('status');
+
+    const statusStats =
+      statusCounts?.reduce(
+        (acc, inquiry) => {
+          acc[inquiry.status] = (acc[inquiry.status] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>
+      ) || {};
+
     return {
       stats: {
         totalUsers: totalUsers || 0,
         totalInquiries: totalInquiries || 0,
         pendingInquiries: statusStats.PENDING || 0,
         processingInquiries: statusStats.PROCESSING || 0,
-        resolvedInquiries: statusStats.RESOLVED || 0
+        resolvedInquiries: statusStats.RESOLVED || 0,
       },
-      recentInquiries: (recentInquiries || []) as RecentInquiry[]
+      recentInquiries: (recentInquiries || []).map((inquiry: any) => ({
+        id: inquiry.id,
+        inquiry_type: inquiry.inquiry_type,
+        inquiry_message: inquiry.inquiry_message,
+        status: inquiry.status,
+        created_at: inquiry.created_at,
+        users: {
+          name: inquiry.users?.[0]?.name || null,
+          email: inquiry.users?.[0]?.email || '',
+        },
+      })) as RecentInquiry[],
     };
-    
   } catch (error) {
     console.error('대시보드 데이터 로딩 실패:', error);
     return null;
@@ -87,7 +100,7 @@ async function getDashboardData(): Promise<{
 
 export default async function Home() {
   const data = await getDashboardData();
-  
+
   // 기본값 설정 (API 실패 시)
   const stats = data?.stats || {
     totalUsers: 0,
@@ -96,7 +109,7 @@ export default async function Home() {
     processingInquiries: 0,
     resolvedInquiries: 0,
   };
-  
+
   const recentInquiries = data?.recentInquiries || [];
 
   return (
@@ -163,11 +176,13 @@ export default async function Home() {
               {recentInquiries.length > 0 ? (
                 recentInquiries.map((inquiry) => {
                   const userName = inquiry.users?.name || inquiry.users?.email || '익명 사용자';
-                  const inquiryTypeKorean = inquiry.inquiry_type === 'URL_VERIFICATION' ? 'URL 검증' : '일반 문의';
-                  const message = inquiry.inquiry_message 
-                    ? inquiry.inquiry_message.substring(0, 50) + (inquiry.inquiry_message.length > 50 ? '...' : '')
+                  const inquiryTypeKorean =
+                    inquiry.inquiry_type === 'URL_VERIFICATION' ? 'URL 검증' : '일반 문의';
+                  const message = inquiry.inquiry_message
+                    ? inquiry.inquiry_message.substring(0, 50) +
+                      (inquiry.inquiry_message.length > 50 ? '...' : '')
                     : inquiryTypeKorean;
-                  
+
                   const getStatusBadge = (status: string) => {
                     switch (status) {
                       case 'PENDING':
@@ -182,7 +197,7 @@ export default async function Home() {
                         return <Badge variant="secondary">{status}</Badge>;
                     }
                   };
-                  
+
                   return (
                     <div key={inquiry.id} className="flex items-center space-x-4">
                       <div className="flex-1 space-y-1">
@@ -197,9 +212,7 @@ export default async function Home() {
                   );
                 })
               ) : (
-                <div className="text-center text-muted-foreground py-4">
-                  문의가 없습니다.
-                </div>
+                <div className="text-muted-foreground py-4 text-center">문의가 없습니다.</div>
               )}
             </div>
           </CardContent>

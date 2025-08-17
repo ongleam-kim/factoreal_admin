@@ -6,32 +6,47 @@ import { eq, and, or, like, desc, asc, gte, lte, sql, count } from 'drizzle-orm'
 
 // Validation schema for query parameters
 const querySchema = z.object({
-  page: z.string().optional().transform(val => val ? parseInt(val) : 1),
-  limit: z.string().optional().transform(val => val ? Math.min(parseInt(val) || 20, 100) : 20),
+  page: z
+    .string()
+    .optional()
+    .transform((val) => (val ? parseInt(val) : 1)),
+  limit: z
+    .string()
+    .optional()
+    .transform((val) => (val ? Math.min(parseInt(val) || 20, 100) : 20)),
   sortBy: z.enum(['user_name', 'company_name', 'inquiry_created_at']).optional(),
   sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
-  inquiryType: z.string().optional().transform(val => val ? val.split(',') : undefined),
-  inquiryStatus: z.string().optional().transform(val => val ? val.split(',') : undefined),
+  inquiryType: z
+    .string()
+    .optional()
+    .transform((val) => (val ? val.split(',') : undefined)),
+  inquiryStatus: z
+    .string()
+    .optional()
+    .transform((val) => (val ? val.split(',') : undefined)),
   dateFrom: z.string().optional(),
   dateTo: z.string().optional(),
-  search: z.string().optional()
+  search: z.string().optional(),
 });
 
 // Authentication middleware
 async function checkAuth() {
-  const supabase = createSupabaseServerClient();
-  const { data: { user }, error } = await supabase.auth.getUser();
-  
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
   if (error || !user) {
     throw new Error('Unauthorized');
   }
-  
+
   // Check admin role
   const userRole = user.user_metadata?.role || 'user';
   if (userRole !== 'admin') {
     throw new Error('Admin access required');
   }
-  
+
   return user;
 }
 
@@ -39,61 +54,52 @@ export async function GET(request: NextRequest) {
   try {
     // Check authentication
     await checkAuth();
-    
+
     // Parse and validate query parameters
     const url = new URL(request.url);
     const queryParams = Object.fromEntries(url.searchParams.entries());
-    
+
     const validation = querySchema.safeParse(queryParams);
     if (!validation.success) {
       return NextResponse.json(
         {
           success: false,
           error: 'Invalid query parameters',
-          details: validation.error.errors
+          details: validation.error.issues,
         },
         { status: 400 }
       );
     }
 
-    const {
-      page,
-      limit,
-      sortBy,
-      sortOrder,
-      inquiryType,
-      inquiryStatus,
-      dateFrom,
-      dateTo,
-      search
-    } = validation.data;
+    const { page, limit, sortBy, sortOrder, inquiryType, inquiryStatus, dateFrom, dateTo, search } =
+      validation.data;
 
     // Build query conditions
     const conditions = [];
-    
+
     if (inquiryType && inquiryType.length > 0) {
-      conditions.push(sql`${inquiries.type} = ANY(${inquiryType})`);
+      conditions.push(sql`${inquiries.inquiryType} = ANY(${inquiryType})`);
     }
-    
+
     if (inquiryStatus && inquiryStatus.length > 0) {
       conditions.push(sql`${inquiries.status} = ANY(${inquiryStatus})`);
     }
-    
+
     if (dateFrom) {
       conditions.push(gte(inquiries.createdAt, new Date(dateFrom)));
     }
-    
+
     if (dateTo) {
       conditions.push(lte(inquiries.createdAt, new Date(dateTo)));
     }
-    
+
     if (search) {
       conditions.push(
         or(
           like(users.name, `%${search}%`),
           like(users.email, `%${search}%`),
           like(users.companyName, `%${search}%`),
-          like(inquiries.title, `%${search}%`)
+          like(inquiries.inquiryMessage, `%${search}%`)
         )
       );
     }
@@ -119,43 +125,40 @@ export async function GET(request: NextRequest) {
         user_email: users.email,
         company_name: users.companyName,
         user_registered_at: users.createdAt,
-        last_login_at: users.lastLoginAt,
+        // lastLoginAt 필드 제거 (스키마에 존재하지 않음)
         inquiry_id: inquiries.id,
-        inquiry_type: inquiries.type,
-        inquiry_title: inquiries.title,
+        inquiry_type: inquiries.inquiryType,
+        inquiry_message: inquiries.inquiryMessage,
         inquiry_status: inquiries.status,
-        priority: inquiries.priority,
+        // priority 필드 제거 (스키마에 존재하지 않음)
         inquiry_created_at: inquiries.createdAt,
         inquiry_updated_at: inquiries.updatedAt,
         // Calculate stats using window functions
         total_inquiries: sql<number>`COUNT(*) OVER (PARTITION BY ${users.id})`,
-        resolved_inquiries: sql<number>`COUNT(CASE WHEN ${inquiries.status} = 'resolved' THEN 1 END) OVER (PARTITION BY ${users.id})`
+        resolved_inquiries: sql<number>`COUNT(CASE WHEN ${inquiries.status} = 'resolved' THEN 1 END) OVER (PARTITION BY ${users.id})`,
       })
       .from(users)
       .leftJoin(inquiries, eq(users.id, inquiries.userId));
 
     // Apply conditions
-    let query = baseQuery;
-    if (conditions.length > 0) {
-      query = query.where(and(...conditions));
-    }
+    const query = conditions.length > 0 ? baseQuery.where(and(...conditions)) : baseQuery;
 
     // Execute main query with pagination
-    const results = await query
-      .orderBy(orderBy)
-      .limit(limit)
-      .offset(offset);
+    const results = await query.orderBy(orderBy).limit(limit).offset(offset);
 
     // Get total count for pagination
-    let countQuery = db
-      .select({ count: count() })
-      .from(users)
-      .leftJoin(inquiries, eq(users.id, inquiries.userId));
-    
-    if (conditions.length > 0) {
-      countQuery = countQuery.where(and(...conditions));
-    }
-    
+    const countQuery =
+      conditions.length > 0
+        ? db
+            .select({ count: count() })
+            .from(users)
+            .leftJoin(inquiries, eq(users.id, inquiries.userId))
+            .where(and(...conditions))
+        : db
+            .select({ count: count() })
+            .from(users)
+            .leftJoin(inquiries, eq(users.id, inquiries.userId));
+
     const [{ count: totalCount }] = await countQuery;
     const totalPages = Math.ceil(totalCount / limit);
 
@@ -167,30 +170,20 @@ export async function GET(request: NextRequest) {
         totalPages,
         totalCount,
         hasNext: page < totalPages,
-        hasPrev: page > 1
-      }
+        hasPrev: page > 1,
+      },
     });
-
   } catch (error) {
     console.error('Users-inquiries API error:', error);
-    
+
     if (error instanceof Error && error.message === 'Unauthorized') {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
-    
+
     if (error instanceof Error && error.message === 'Admin access required') {
-      return NextResponse.json(
-        { success: false, error: 'Admin access required' },
-        { status: 403 }
-      );
+      return NextResponse.json({ success: false, error: 'Admin access required' }, { status: 403 });
     }
-    
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    );
+
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }

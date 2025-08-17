@@ -15,23 +15,25 @@ export const createSupabaseClient = () => {
 };
 
 // Server client for server-side operations
-export const createSupabaseServerClient = () => {
-  const cookieStore = cookies();
-  
+export const createSupabaseServerClient = async () => {
+  const cookieStore = await cookies();
+
   return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       get(key: string) {
         return cookieStore.get(key)?.value;
-      }
-    }
+      },
+    },
   });
 };
 
 // Admin client with service role for admin operations
 export const createSupabaseAdminClient = () => {
   if (!supabaseServiceKey) {
-    throw new Error('SUPABASE_SERVICE_ROLE_KEY environment variable is required for admin operations');
+    throw new Error(
+      'SUPABASE_SERVICE_ROLE_KEY environment variable is required for admin operations'
+    );
   }
-  
+
   return createBrowserClient(supabaseUrl, supabaseServiceKey);
 };

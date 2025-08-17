@@ -71,30 +71,29 @@ export default function UsersInquiriesPage() {
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
 
-  const fetchData = async (search: string = '') => {
+  const fetchData = async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
-      if (search) params.append('search', search);
-      params.append('limit', '50');
+      params.append('limit', '100'); // 더 많은 데이터를 가져와서 클라이언트에서 필터링
       params.append('offset', '0');
-      
+
       const response = await fetch(`/api/users-inquiries?${params.toString()}`);
       const result = await response.json();
-      
+
       if (result.success) {
         // Date 문자열을 Date 객체로 변환
         const transformedData = result.data.items.map((item: any) => ({
           ...item,
           user: {
             ...item.user,
-            registeredAt: new Date(item.user.registeredAt)
+            registeredAt: new Date(item.user.registeredAt),
           },
           inquiry: {
             ...item.inquiry,
             createdAt: new Date(item.inquiry.createdAt),
-            updatedAt: new Date(item.inquiry.updatedAt)
-          }
+            updatedAt: new Date(item.inquiry.updatedAt),
+          },
         }));
         setData(transformedData);
         setTotal(result.data.total);
@@ -113,19 +112,25 @@ export default function UsersInquiriesPage() {
   };
 
   useEffect(() => {
-    fetchData(searchTerm);
+    fetchData();
   }, []);
 
-  useEffect(() => {
-    const debounceTimer = setTimeout(() => {
-      fetchData(searchTerm);
-    }, 300);
-    
-    return () => clearTimeout(debounceTimer);
-  }, [searchTerm]);
+  // 클라이언트 사이드 필터링
+  const filteredData = data.filter((item) => {
+    if (!searchTerm) return true;
+
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      item.user.name.toLowerCase().includes(searchLower) ||
+      item.user.email.toLowerCase().includes(searchLower) ||
+      (item.user.companyName && item.user.companyName.toLowerCase().includes(searchLower)) ||
+      item.inquiry.title.toLowerCase().includes(searchLower) ||
+      item.inquiry.content.toLowerCase().includes(searchLower)
+    );
+  });
 
   const handleRefresh = () => {
-    fetchData(searchTerm);
+    fetchData();
   };
 
   const handleSendEmail = (userInquiry: UserInquiryJoin) => {
@@ -168,8 +173,10 @@ export default function UsersInquiriesPage() {
       <Card>
         <CardHeader>
           <CardTitle>
-            사용자 & 문의 목록 
-            {!loading && <span className="text-muted-foreground text-sm ml-2">({total}건)</span>}
+            사용자 & 문의 목록
+            {!loading && (
+              <span className="text-muted-foreground ml-2 text-sm">({filteredData.length}건)</span>
+            )}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -188,49 +195,49 @@ export default function UsersInquiriesPage() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8">
+                  <TableCell colSpan={7} className="py-8 text-center">
                     <div className="flex items-center justify-center">
                       <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
                       데이터를 로딩 중입니다...
                     </div>
                   </TableCell>
                 </TableRow>
-              ) : data.length === 0 ? (
+              ) : filteredData.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8">
+                  <TableCell colSpan={7} className="py-8 text-center">
                     <p className="text-muted-foreground">
                       {searchTerm ? '검색 결과가 없습니다.' : '문의가 없습니다.'}
                     </p>
                   </TableCell>
                 </TableRow>
               ) : (
-                data.map((item) => (
-                <TableRow key={item.inquiry.id}>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{item.user.name}</div>
-                      <div className="text-muted-foreground text-sm">{item.user.email}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell>{item.user.companyName || '-'}</TableCell>
-                  <TableCell>{getTypeBadge(item.inquiry.type)}</TableCell>
-                  <TableCell>
-                    <div className="max-w-xs">
-                      <div className="truncate font-medium">{item.inquiry.title}</div>
-                      <div className="text-muted-foreground text-sm">
-                        응답 {item.inquiry.responseCount}회
+                filteredData.map((item) => (
+                  <TableRow key={item.inquiry.id}>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{item.user.name}</div>
+                        <div className="text-muted-foreground text-sm">{item.user.email}</div>
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>{getStatusBadge(item.inquiry.status)}</TableCell>
-                  <TableCell>{item.inquiry.createdAt.toLocaleDateString('ko-KR')}</TableCell>
-                  <TableCell>
-                    <Button variant="outline" size="sm" onClick={() => handleSendEmail(item)}>
-                      <Mail className="mr-2 h-4 w-4" />
-                      이메일
-                    </Button>
-                  </TableCell>
-                </TableRow>
+                    </TableCell>
+                    <TableCell>{item.user.companyName || '-'}</TableCell>
+                    <TableCell>{getTypeBadge(item.inquiry.type)}</TableCell>
+                    <TableCell>
+                      <div className="max-w-xs">
+                        <div className="truncate font-medium">{item.inquiry.title}</div>
+                        <div className="text-muted-foreground text-sm">
+                          응답 {item.inquiry.responseCount}회
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>{getStatusBadge(item.inquiry.status)}</TableCell>
+                    <TableCell>{item.inquiry.createdAt.toLocaleDateString('ko-KR')}</TableCell>
+                    <TableCell>
+                      <Button variant="outline" size="sm" onClick={() => handleSendEmail(item)}>
+                        <Mail className="mr-2 h-4 w-4" />
+                        이메일
+                      </Button>
+                    </TableCell>
+                  </TableRow>
                 ))
               )}
             </TableBody>

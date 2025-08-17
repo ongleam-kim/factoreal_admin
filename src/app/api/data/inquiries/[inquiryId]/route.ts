@@ -5,32 +5,35 @@ import { eq } from 'drizzle-orm';
 
 // Authentication middleware
 async function checkAuth() {
-  const supabase = createSupabaseServerClient();
-  const { data: { user }, error } = await supabase.auth.getUser();
-  
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
   if (error || !user) {
     throw new Error('Unauthorized');
   }
-  
+
   // Check admin role
   const userRole = user.user_metadata?.role || 'user';
   if (userRole !== 'admin') {
     throw new Error('Admin access required');
   }
-  
+
   return user;
 }
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { inquiryId: string } }
+  { params }: { params: Promise<{ inquiryId: string }> }
 ) {
   try {
     // Check authentication
     await checkAuth();
-    
-    const { inquiryId } = params;
-    
+
+    const { inquiryId } = await params;
+
     if (!inquiryId) {
       return NextResponse.json(
         { success: false, error: 'Inquiry ID is required' },
@@ -42,7 +45,7 @@ export async function GET(
     const result = await db
       .select({
         inquiry: inquiries,
-        user: users
+        user: users,
       })
       .from(inquiries)
       .leftJoin(users, eq(inquiries.userId, users.id))
@@ -50,10 +53,7 @@ export async function GET(
       .limit(1);
 
     if (!result.length) {
-      return NextResponse.json(
-        { success: false, error: 'Inquiry not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ success: false, error: 'Inquiry not found' }, { status: 404 });
     }
 
     const { inquiry, user } = result[0];
@@ -62,30 +62,20 @@ export async function GET(
       success: true,
       data: {
         inquiry,
-        user
-      }
+        user,
+      },
     });
-
   } catch (error) {
     console.error('Inquiry detail API error:', error);
-    
+
     if (error instanceof Error && error.message === 'Unauthorized') {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
-    
+
     if (error instanceof Error && error.message === 'Admin access required') {
-      return NextResponse.json(
-        { success: false, error: 'Admin access required' },
-        { status: 403 }
-      );
+      return NextResponse.json({ success: false, error: 'Admin access required' }, { status: 403 });
     }
-    
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    );
+
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
