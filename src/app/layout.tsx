@@ -38,7 +38,7 @@ export default function RootLayout({
         <div className="flex h-screen flex-col">
           <Header user={user} onLogout={handleLogout} />
           <div className="flex flex-1 overflow-hidden">
-            <Sidebar className="bg-muted/40 hidden flex-col border-r md:flex" />
+            <Sidebar className="hidden flex-col border-r bg-muted/40 md:flex" />
             <main className="flex-1 overflow-y-auto p-6">{children}</main>
           </div>
         </div>

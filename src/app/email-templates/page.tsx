@@ -242,7 +242,7 @@ export default function EmailTemplatesPage() {
                 id="category"
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="border-input bg-background ring-offset-background col-span-3 flex h-10 w-full rounded-md border px-3 py-2 text-sm"
+                className="col-span-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
               >
                 <option value="general">일반</option>
                 <option value="technical">기술</option>

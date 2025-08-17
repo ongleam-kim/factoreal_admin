@@ -22,11 +22,11 @@ export default function DashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">총 사용자</CardTitle>
-            <Users className="text-muted-foreground h-4 w-4" />
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalUsers.toLocaleString()}</div>
-            <p className="text-muted-foreground text-xs">
+            <p className="text-xs text-muted-foreground">
               <span className="text-green-600">+12%</span> 전월 대비
             </p>
           </CardContent>
@@ -35,11 +35,11 @@ export default function DashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">총 문의</CardTitle>
-            <FileText className="text-muted-foreground h-4 w-4" />
+            <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalInquiries.toLocaleString()}</div>
-            <p className="text-muted-foreground text-xs">
+            <p className="text-xs text-muted-foreground">
               <span className="text-green-600">+8%</span> 전월 대비
             </p>
           </CardContent>
@@ -48,22 +48,22 @@ export default function DashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">이메일 템플릿</CardTitle>
-            <Mail className="text-muted-foreground h-4 w-4" />
+            <Mail className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.emailTemplates}</div>
-            <p className="text-muted-foreground text-xs">활성 템플릿 수</p>
+            <p className="text-xs text-muted-foreground">활성 템플릿 수</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">발송된 이메일</CardTitle>
-            <TrendingUp className="text-muted-foreground h-4 w-4" />
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.emailsSent}</div>
-            <p className="text-muted-foreground text-xs">오늘 발송</p>
+            <p className="text-xs text-muted-foreground">오늘 발송</p>
           </CardContent>
         </Card>
       </div>
@@ -80,21 +80,21 @@ export default function DashboardPage() {
               <div className="flex items-center space-x-4">
                 <div className="flex-1 space-y-1">
                   <p className="text-sm font-medium">김철수</p>
-                  <p className="text-muted-foreground text-sm">기술 문의 - API 연동 관련</p>
+                  <p className="text-sm text-muted-foreground">기술 문의 - API 연동 관련</p>
                 </div>
                 <Badge variant="outline">진행중</Badge>
               </div>
               <div className="flex items-center space-x-4">
                 <div className="flex-1 space-y-1">
                   <p className="text-sm font-medium">이영희</p>
-                  <p className="text-muted-foreground text-sm">일반 문의 - 가격 정책</p>
+                  <p className="text-sm text-muted-foreground">일반 문의 - 가격 정책</p>
                 </div>
                 <Badge variant="secondary">대기</Badge>
               </div>
               <div className="flex items-center space-x-4">
                 <div className="flex-1 space-y-1">
                   <p className="text-sm font-medium">박민수</p>
-                  <p className="text-muted-foreground text-sm">파트너십 문의</p>
+                  <p className="text-sm text-muted-foreground">파트너십 문의</p>
                 </div>
                 <Badge variant="default">완료</Badge>
               </div>

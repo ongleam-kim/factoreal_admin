@@ -46,8 +46,8 @@ export function Header({ user, onLogout }: HeaderProps) {
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm leading-none font-medium">{user?.name || '관리자'}</p>
-                  <p className="text-muted-foreground text-xs leading-none">
+                  <p className="text-sm font-medium leading-none">{user?.name || '관리자'}</p>
+                  <p className="text-xs leading-none text-muted-foreground">
                     {user?.email || 'admin@factoreal.com'}
                   </p>
                 </div>

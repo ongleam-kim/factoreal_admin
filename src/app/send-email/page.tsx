@@ -142,8 +142,8 @@ export default function SendEmailPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="font-medium">{user.name}</div>
-                      <div className="text-muted-foreground text-sm">{user.email}</div>
-                      <div className="text-muted-foreground text-xs">{user.companyName}</div>
+                      <div className="text-sm text-muted-foreground">{user.email}</div>
+                      <div className="text-xs text-muted-foreground">{user.companyName}</div>
                     </div>
                     {selectedUsers.find((u) => u.id === user.id) && (
                       <Badge variant="default">선택됨</Badge>
@@ -154,7 +154,7 @@ export default function SendEmailPage() {
             </div>
 
             {selectedUsers.length > 0 && (
-              <div className="bg-muted mt-4 rounded-lg p-3">
+              <div className="mt-4 rounded-lg bg-muted p-3">
                 <div className="mb-2 text-sm font-medium">
                   선택된 수신자 ({selectedUsers.length}명):
                 </div>
@@ -191,7 +191,7 @@ export default function SendEmailPage() {
                   onClick={() => handleTemplateSelect(template)}
                 >
                   <div className="font-medium">{template.name}</div>
-                  <div className="text-muted-foreground mt-1 text-sm">{template.subject}</div>
+                  <div className="mt-1 text-sm text-muted-foreground">{template.subject}</div>
                   <Badge variant="outline" className="mt-2">
                     {template.category}
                   </Badge>
@@ -199,8 +199,8 @@ export default function SendEmailPage() {
               ))}
             </div>
 
-            <div className="bg-muted mt-4 rounded-lg p-3">
-              <div className="text-muted-foreground text-sm">
+            <div className="mt-4 rounded-lg bg-muted p-3">
+              <div className="text-sm text-muted-foreground">
                 템플릿을 선택하면 제목과 내용이 자동으로 입력됩니다. 필요에 따라 수정할 수 있습니다.
               </div>
             </div>
@@ -230,11 +230,11 @@ export default function SendEmailPage() {
               </div>
               <div>
                 <Label>제목:</Label>
-                <div className="bg-muted/50 mt-1 rounded border p-2">{subject || '제목 없음'}</div>
+                <div className="mt-1 rounded border bg-muted/50 p-2">{subject || '제목 없음'}</div>
               </div>
               <div>
                 <Label>내용:</Label>
-                <div className="bg-muted/50 mt-1 min-h-[200px] rounded border p-3 whitespace-pre-wrap">
+                <div className="mt-1 min-h-[200px] whitespace-pre-wrap rounded border bg-muted/50 p-3">
                   {content || '내용 없음'}
                 </div>
               </div>
@@ -270,7 +270,7 @@ export default function SendEmailPage() {
       <Card>
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
-            <div className="text-muted-foreground text-sm">
+            <div className="text-sm text-muted-foreground">
               {selectedUsers.length}명의 수신자에게 이메일을 발송합니다.
             </div>
             <Button

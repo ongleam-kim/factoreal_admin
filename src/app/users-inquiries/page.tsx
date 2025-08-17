@@ -158,7 +158,7 @@ export default function UsersInquiriesPage() {
         <CardContent>
           <div className="flex items-center space-x-2">
             <div className="relative flex-1">
-              <Search className="text-muted-foreground absolute top-2.5 left-2 h-4 w-4" />
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="이름, 이메일, 회사명, 문의 제목으로 검색..."
                 value={searchTerm}
@@ -175,7 +175,7 @@ export default function UsersInquiriesPage() {
           <CardTitle>
             사용자 & 문의 목록
             {!loading && (
-              <span className="text-muted-foreground ml-2 text-sm">({filteredData.length}건)</span>
+              <span className="ml-2 text-sm text-muted-foreground">({filteredData.length}건)</span>
             )}
           </CardTitle>
         </CardHeader>
@@ -216,7 +216,7 @@ export default function UsersInquiriesPage() {
                     <TableCell>
                       <div>
                         <div className="font-medium">{item.user.name}</div>
-                        <div className="text-muted-foreground text-sm">{item.user.email}</div>
+                        <div className="text-sm text-muted-foreground">{item.user.email}</div>
                       </div>
                     </TableCell>
                     <TableCell>{item.user.companyName || '-'}</TableCell>
@@ -224,7 +224,7 @@ export default function UsersInquiriesPage() {
                     <TableCell>
                       <div className="max-w-xs">
                         <div className="truncate font-medium">{item.inquiry.title}</div>
-                        <div className="text-muted-foreground text-sm">
+                        <div className="text-sm text-muted-foreground">
                           응답 {item.inquiry.responseCount}회
                         </div>
                       </div>
