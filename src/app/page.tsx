@@ -41,24 +41,32 @@ async function getDashboardData(): Promise<{
       .from('inquiries')
       .select('*', { count: 'exact', head: true });
 
-    // 최근 문의 5개 (사용자 정보와 함께)
-    const { data: recentInquiries } = await supabase
+    // 최근 문의 5개
+    const { data: recentInquiries, error: inquiriesError } = await supabase
       .from('inquiries')
-      .select(
-        `
-        id,
-        inquiry_type,
-        inquiry_message,
-        status,
-        created_at,
-        users (
-          name,
-          email
-        )
-      `
-      )
+      .select('id, inquiry_type, inquiry_message, status, created_at, user_id')
       .order('created_at', { ascending: false })
       .limit(5);
+
+    if (inquiriesError) {
+      console.error('최근 문의 조회 에러:', inquiriesError);
+    }
+
+    // 각 문의의 사용자 정보를 별도로 조회
+    const inquiriesWithUsers = await Promise.all(
+      (recentInquiries || []).map(async (inquiry) => {
+        const { data: user } = await supabase
+          .from('users')
+          .select('name, email')
+          .eq('id', inquiry.user_id)
+          .single();
+
+        return {
+          ...inquiry,
+          users: user || null,
+        };
+      })
+    );
 
     // 상태별 문의 수
     const { data: statusCounts } = await supabase.from('inquiries').select('status');
@@ -80,15 +88,15 @@ async function getDashboardData(): Promise<{
         processingInquiries: statusStats.PROCESSING || 0,
         resolvedInquiries: statusStats.RESOLVED || 0,
       },
-      recentInquiries: (recentInquiries || []).map((inquiry: any) => ({
+      recentInquiries: inquiriesWithUsers.map((inquiry: any) => ({
         id: inquiry.id,
         inquiry_type: inquiry.inquiry_type,
         inquiry_message: inquiry.inquiry_message,
         status: inquiry.status,
         created_at: inquiry.created_at,
         users: {
-          name: inquiry.users?.[0]?.name || null,
-          email: inquiry.users?.[0]?.email || '',
+          name: inquiry.users?.name || null,
+          email: inquiry.users?.email || '',
         },
       })) as RecentInquiry[],
     };
@@ -123,44 +131,44 @@ export default async function Home() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">총 사용자</CardTitle>
-            <Users className="text-muted-foreground h-4 w-4" />
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalUsers.toLocaleString()}</div>
-            <p className="text-muted-foreground text-xs">등록된 사용자 수</p>
+            <p className="text-xs text-muted-foreground">등록된 사용자 수</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">총 문의</CardTitle>
-            <FileText className="text-muted-foreground h-4 w-4" />
+            <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalInquiries.toLocaleString()}</div>
-            <p className="text-muted-foreground text-xs">전체 문의 건수</p>
+            <p className="text-xs text-muted-foreground">전체 문의 건수</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">대기 중 문의</CardTitle>
-            <Mail className="text-muted-foreground h-4 w-4" />
+            <Mail className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.pendingInquiries}</div>
-            <p className="text-muted-foreground text-xs">처리 대기 중</p>
+            <p className="text-xs text-muted-foreground">처리 대기 중</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">처리 완료</CardTitle>
-            <TrendingUp className="text-muted-foreground h-4 w-4" />
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.resolvedInquiries}</div>
-            <p className="text-muted-foreground text-xs">완료된 문의</p>
+            <p className="text-xs text-muted-foreground">완료된 문의</p>
           </CardContent>
         </Card>
       </div>
@@ -202,8 +210,8 @@ export default async function Home() {
                     <div key={inquiry.id} className="flex items-center space-x-4">
                       <div className="flex-1 space-y-1">
                         <p className="text-sm font-medium">{userName}</p>
-                        <p className="text-muted-foreground text-sm">{message}</p>
-                        <p className="text-muted-foreground text-xs">
+                        <p className="text-sm text-muted-foreground">{message}</p>
+                        <p className="text-xs text-muted-foreground">
                           {new Date(inquiry.created_at).toLocaleDateString('ko-KR')}
                         </p>
                       </div>
@@ -212,7 +220,7 @@ export default async function Home() {
                   );
                 })
               ) : (
-                <div className="text-muted-foreground py-4 text-center">문의가 없습니다.</div>
+                <div className="py-4 text-center text-muted-foreground">문의가 없습니다.</div>
               )}
             </div>
           </CardContent>
